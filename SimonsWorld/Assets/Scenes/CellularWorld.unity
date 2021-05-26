@@ -333,8 +333,8 @@ MonoBehaviour:
   m_WaterBlock: {fileID: 4869598155647245208, guid: 0f01785ee01083f4eafd1652799c14a8, type: 3}
   m_StoneBlock: {fileID: 129749279852646279, guid: b06ad40372b60144d8e8d15ebf2a2fc6, type: 3}
   m_EmptyBlock: {fileID: 5506594036363603504, guid: ae57ab371f033bd43bfee7b8738f0160, type: 3}
-  m_FillPercent: 27.1
-  m_ClimbPercent: 46.4
+  m_FillPercent: 84.8
+  m_ClimbPercent: 24.1
   m_WorldSizeX: 20
   m_WorldSizeY: 4
   m_WorldSizeZ: 20
@@ -402,11 +402,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61c51b587e9623548810914b57e4a75b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  closestNode: {fileID: 0}
-  ActiveNode: {fileID: 0}
-  nextNode: {fileID: 0}
-  Start: 0
-  justStarting: 1
+  open: []
+  closed: []
+  Path: []
+  startNode: {fileID: 0}
+  targetNode: {fileID: 0}
+  targetObject: {fileID: 1991978235}
+  StartSearch: 0
 --- !u!65 &1784543887
 BoxCollider:
   m_ObjectHideFlags: 0

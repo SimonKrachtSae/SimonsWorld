@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TargetObject : MonoBehaviour
 {
+    
     void Start()
     {
         
@@ -18,7 +19,7 @@ public class TargetObject : MonoBehaviour
         Node closestNode = null;
         for (int i = 0; i < NodeManager.Instance.m_nodes.Count; i++)
         {
-            float distance = (NodeManager.Instance.m_nodes[i].position - transform.position).magnitude;
+            float distance = (NodeManager.Instance.m_nodes[i].transform.position - transform.position).magnitude;
             if (distance < closestDistance)
             {
                 closestNode = NodeManager.Instance.m_nodes[i];
