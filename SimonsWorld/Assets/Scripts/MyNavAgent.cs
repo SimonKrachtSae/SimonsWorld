@@ -44,25 +44,33 @@ public class MyNavAgent : MonoBehaviour
     }
     private void AStar()
     {
-        open = new List<Node>();
-        closed = new List<Node>();
-        startNode = ClosestNode();
-        Path = new List<Node>();
-
-        startNode.SetG_Cost();
-        startNode.SetH_Cost(targetNode);
-        current = startNode;
-        current.Previous = current;
-        SetPreviousNode();
-
-        open.Add(current);
+        RefreshLists();
+        SetStartNode();
+        //SetPreviousNode();
 
         SetNextCurrent();
     }
+    private void RefreshLists()
+    {
+        open = new List<Node>();
+        closed = new List<Node>();
+        Path = new List<Node>();
+    }
+    void SetStartNode()
+    {
+        startNode = ClosestNode();
+        //startNode.SetG_Cost();
+        startNode.SetH_Cost(targetNode);
+        current = startNode;
+        open.Add(current);
+    }
+    
     private void SetNextCurrent()
     {
+        int counter = 1000;
         while(current != targetNode && current != null)
         {
+            counter--;
             Node nextCurrentNode = null;
             float lowestF_Cost = Mathf.Infinity;
             current.SetSurroundingNodesCosts(targetNode);
@@ -72,14 +80,14 @@ public class MyNavAgent : MonoBehaviour
                 if(current.surroundingNodes[j].Previous == null)
                 {
                     current.surroundingNodes[j].Previous = current;
-                    current.surroundingNodes[j].SetG_Cost();
+                    //current.surroundingNodes[j].SetG_Cost();
                     current.surroundingNodes[j].SetH_Cost(targetNode);
                 }
                 
                 if(current.surroundingNodes[j].GetPotentialG_Cost(current) < current.surroundingNodes[j].G_Cost)
                 {
                     current.surroundingNodes[j].Previous = current;
-                    current.surroundingNodes[j].SetG_Cost();
+                    //current.surroundingNodes[j].SetG_Cost();
                     current.surroundingNodes[j].SetH_Cost(targetNode);
                 }
             }
@@ -99,6 +107,9 @@ public class MyNavAgent : MonoBehaviour
             }
             open.Remove(current);
             current = nextCurrentNode;
+
+            if (counter <= 1)
+                break;
         }
         closed.Add(targetNode);
         BackTrace();
@@ -117,11 +128,15 @@ public class MyNavAgent : MonoBehaviour
     private void BackTrace()
     {
         Node lastNode = targetNode;
+        int counter = 1000;
         while(lastNode != startNode)
         {
+            counter--;
             lastNode.nodeColor = Color.blue;
             Path.Add(lastNode);
             lastNode = lastNode.Previous;
+            if (counter <= 1)
+                break;
         }
     }
     private void AddToOpen(Node node)
@@ -133,15 +148,18 @@ public class MyNavAgent : MonoBehaviour
         }
     }
 
-    private void SetPreviousNode()
+    private void SetSurroundingPreviousNodes(Node node)
     {
-        for (int i = 0; i < current.surroundingNodes.Count; i++)
+        for (int i = 0; i < node.surroundingNodes.Count; i++)
         {
+            if (!closed.Contains(node))
+                return;
             current.surroundingNodes[i].Previous = current;
-            current.surroundingNodes[i].SetG_Cost();
+            //current.surroundingNodes[i].SetG_Cost();
             current.surroundingNodes[i].SetH_Cost(targetNode);
         }
     }
+
     private Node ClosestNode()
     {
         float closestDistance = Mathf.Infinity;

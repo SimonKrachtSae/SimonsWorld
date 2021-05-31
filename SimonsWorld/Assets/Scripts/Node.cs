@@ -8,7 +8,7 @@ public class Node : MonoBehaviour
     public List<Node> surroundingNodes = new List<Node>();
 
     public float H_Cost;
-    public float G_Cost;
+    public float G_Cost = 10000;
     public float F_Cost { get => H_Cost + G_Cost; }
 
     public Node Previous;
@@ -18,6 +18,7 @@ public class Node : MonoBehaviour
     private void Start()
     {
         CheckIfNodeIsInWater();
+        G_Cost = 10000;
     }
     public void ConfigSurroundingNodes()
     {
@@ -26,7 +27,7 @@ public class Node : MonoBehaviour
             Node node = NodeManager.Instance.m_nodes[i];
             if (node != this )
             {
-                if((node.transform.position - this.transform.position).magnitude < 1.5f)
+                if((node.transform.position - this.transform.position).magnitude < 1.8f)
                 {
                     surroundingNodes.Add(node);
                 }
@@ -65,35 +66,22 @@ public class Node : MonoBehaviour
         float value = (targetNode.transform.position - transform.position).magnitude;
         H_Cost = value;
     }
-    public void SetG_Cost()
+    public void SetG_Cost(Node node)
     {
-        float value = 0;
-        if(Previous == null)
-        {
-            G_Cost = 0;
-            return;
-        }
-
-        if(isWaterNode)
-        {
-            value = (Previous.transform.position - transform.position).magnitude * 2;
-            value += Previous.G_Cost;
-            
-        }
-        else
-        {
-            value = (Previous.transform.position - transform.position).magnitude;
-            value += Previous.G_Cost;
-        }
+        
+        float value = (node.transform.position - transform.position).magnitude;
+        value += node.G_Cost;
+        
         G_Cost = value;
     }
     public void SetPrevious(Node node)
     {
         Previous = node;
     }
+   
     public float GetPotentialG_Cost(Node potPrevious)
     {
-        float value = 0;
+        float value;
         value = (potPrevious.transform.position - transform.position).magnitude;
         value += potPrevious.G_Cost;
         return value;
@@ -104,7 +92,7 @@ public class Node : MonoBehaviour
         for(int i = 0; i < surroundingNodes.Count; i++)
         {
             surroundingNodes[i].SetH_Cost(targetNode);
-            surroundingNodes[i].SetG_Cost();
+            surroundingNodes[i].SetG_Cost(Previous);
         }
     }
     private void OnDrawGizmos()

@@ -45,12 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a6819753b5d1ae4cb681052f67fc130, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isWaterBlock: 1
   surroundingCells: []
   m_NumberOfTexturesPerRow: {x: 16, y: 16}
   m_NumberOfTexture: 2e0000002e0000002e0000002e0000002e0000002e000000
   X_Index: 0
   Y_Index: 0
   Z_Index: 0
+  Position: {x: 0, y: 0, z: 0}
 --- !u!33 &8265178188579847552
 MeshFilter:
   m_ObjectHideFlags: 0

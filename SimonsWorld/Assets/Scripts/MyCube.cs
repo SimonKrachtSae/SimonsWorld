@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MyCube : MonoBehaviour
 {
+    public bool isWaterBlock = false;
     public List<MyCube> surroundingCells;
 
     [SerializeField] private Vector2Int m_NumberOfTexturesPerRow;
@@ -60,7 +61,7 @@ public class MyCube : MonoBehaviour
         m_UVs = new List<Vector2>();
 
         //Front
-        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index + 1))
+        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index + 1) || GetSurroundingCell(X_Index, Y_Index, Z_Index + 1).isWaterBlock)
         { 
             Vertices.Add(FrontBottomRight);
             Vertices.Add(FrontTopRight);
@@ -71,7 +72,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Top
-        if (!SurroundingCellsContains(X_Index, Y_Index + 1,Z_Index))
+        if (!SurroundingCellsContains(X_Index, Y_Index + 1,Z_Index) || GetSurroundingCell(X_Index, Y_Index + 1, Z_Index).isWaterBlock)
         {
             Vertices.Add(FrontTopRight);
             Vertices.Add(BackTopRight);
@@ -82,7 +83,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Back
-        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index - 1))
+        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index - 1) || GetSurroundingCell(X_Index, Y_Index, Z_Index - 1).isWaterBlock)
         { 
             Vertices.Add(BackBottomLeft);
             Vertices.Add(BackTopLeft);
@@ -94,7 +95,7 @@ public class MyCube : MonoBehaviour
 
 
         //Left
-        if (!SurroundingCellsContains(X_Index - 1, Y_Index, Z_Index))
+        if (!SurroundingCellsContains(X_Index - 1, Y_Index, Z_Index) || GetSurroundingCell(X_Index - 1, Y_Index, Z_Index).isWaterBlock)
         {
             Vertices.Add(FrontBottomLeft);
             Vertices.Add(FrontTopLeft);
@@ -105,7 +106,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Right
-        if (!SurroundingCellsContains(X_Index + 1, Y_Index, Z_Index))
+        if (!SurroundingCellsContains(X_Index + 1, Y_Index, Z_Index) || GetSurroundingCell(X_Index + 1, Y_Index, Z_Index).isWaterBlock)
         {
             Vertices.Add(BackBottomRight);
             Vertices.Add(BackTopRight);
@@ -116,7 +117,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Bottom
-        if (!SurroundingCellsContains(X_Index, Y_Index - 1, Z_Index))
+        if (!SurroundingCellsContains(X_Index, Y_Index - 1, Z_Index) || GetSurroundingCell(X_Index, Y_Index-1, Z_Index).isWaterBlock)
         {
             Vertices.Add(BackBottomRight);
             Vertices.Add(FrontBottomRight);
@@ -171,5 +172,17 @@ public class MyCube : MonoBehaviour
             }
         }
         return false;
+    }
+    private MyCube GetSurroundingCell(int X_Index, int Y_Index, int Z_Index)
+    {
+        MyCube cube = null;
+        for (int i = 0; i < surroundingCells.Count; i++)
+        {
+            if (surroundingCells[i].X_Index == X_Index && surroundingCells[i].Y_Index == Y_Index && surroundingCells[i].Z_Index == Z_Index)
+            {
+                cube = surroundingCells[i];
+            }
+        }
+        return cube;
     }
 }

@@ -333,8 +333,8 @@ MonoBehaviour:
   m_WaterBlock: {fileID: 4869598155647245208, guid: 0f01785ee01083f4eafd1652799c14a8, type: 3}
   m_StoneBlock: {fileID: 129749279852646279, guid: b06ad40372b60144d8e8d15ebf2a2fc6, type: 3}
   m_EmptyBlock: {fileID: 5506594036363603504, guid: ae57ab371f033bd43bfee7b8738f0160, type: 3}
-  m_FillPercent: 84.8
-  m_ClimbPercent: 24.1
+  m_FillPercent: 84.7
+  m_ClimbPercent: 26
   m_WorldSizeX: 20
   m_WorldSizeY: 4
   m_WorldSizeZ: 20
@@ -366,9 +366,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Node: {fileID: 8042266654656314195, guid: b1d110dd476e2044399e55c5f8de7c35, type: 3}
   m_nodes: []
-  TargetObject: {fileID: 1991978235}
-  TargetNode: {fileID: 0}
-  navAgent: {fileID: 1784543886}
 --- !u!1 &1784543885
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,6 +380,7 @@ GameObject:
   - component: {fileID: 1784543887}
   - component: {fileID: 1784543886}
   - component: {fileID: 1784543891}
+  - component: {fileID: 1784543892}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -397,7 +395,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1784543885}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61c51b587e9623548810914b57e4a75b, type: 3}
   m_Name: 
@@ -408,7 +406,6 @@ MonoBehaviour:
   startNode: {fileID: 0}
   targetNode: {fileID: 0}
   targetObject: {fileID: 1991978235}
-  StartSearch: 0
 --- !u!65 &1784543887
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -501,6 +498,25 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1784543892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784543885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76d6b1a401f1b21409c7431e4199ddc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  open: []
+  closed: []
+  Path: []
+  targetNode: {fileID: 0}
+  startNode: {fileID: 0}
+  current: {fileID: 0}
+  targetObject: {fileID: 1991978235}
 --- !u!1 &1923394929
 GameObject:
   m_ObjectHideFlags: 0
