@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 174195162644771716}
-  - component: {fileID: 727015297304110618}
   - component: {fileID: 8265178188579847552}
   - component: {fileID: 7048425083272525069}
+  - component: {fileID: 6155986360828040659}
   m_Layer: 0
   m_Name: WaterBlock
   m_TagString: Untagged
@@ -33,26 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &727015297304110618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4869598155647245208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a6819753b5d1ae4cb681052f67fc130, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isWaterBlock: 1
-  surroundingCells: []
-  m_NumberOfTexturesPerRow: {x: 16, y: 16}
-  m_NumberOfTexture: 2e0000002e0000002e0000002e0000002e0000002e000000
-  X_Index: 0
-  Y_Index: 0
-  Z_Index: 0
-  Position: {x: 0, y: 0, z: 0}
 --- !u!33 &8265178188579847552
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -102,3 +82,23 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6155986360828040659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4869598155647245208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c16ef1c5d4a2eae4b859895eaeaca932, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  surroundingCells: []
+  m_NumberOfTexturesPerRow: {x: 16, y: 16}
+  m_NumberOfTexture: 2e0000002e0000002e0000002e0000002e0000002e000000
+  X_Index: 0
+  Y_Index: 0
+  Z_Index: 0
+  Position: {x: 0, y: 0, z: 0}
+  surroundingWaterCubes: []

@@ -4,35 +4,34 @@ using UnityEngine;
 
 public class MyCube : MonoBehaviour
 {
-    public bool isWaterBlock = false;
     public List<MyCube> surroundingCells;
 
-    [SerializeField] private Vector2Int m_NumberOfTexturesPerRow;
+    [SerializeField] private protected Vector2Int m_NumberOfTexturesPerRow;
 
     [SerializeField, Tooltip("front, top, back, left, right,bottom")] public List<int> m_NumberOfTexture;
 
-    private List<Vector2> m_UVs;
+    private protected List<Vector2> m_UVs;
 
     public int X_Index;
     public int Y_Index;
     public int Z_Index;
+          
+    public  Vector3 Position;
+            
+    private protected Vector3 FrontTopLeft;
+    private protected Vector3 FrontTopRight;
+    private protected Vector3 FrontBottomLeft;
+    private protected Vector3 FrontBottomRight;
+            
+    private protected Vector3 BackTopLeft;
+    private protected Vector3 BackTopRight;
+    private protected Vector3 BackBottomLeft;
+    private protected Vector3 BackBottomRight;
+            
+    private protected List<Vector3> Vertices = new List<Vector3>();
+    private protected List<int> Indices = new List<int>();
 
-    public Vector3 Position;
-
-    private Vector3 FrontTopLeft;
-    private Vector3 FrontTopRight;
-    private Vector3 FrontBottomLeft;
-    private Vector3 FrontBottomRight;
-
-    private Vector3 BackTopLeft;
-    private Vector3 BackTopRight;
-    private Vector3 BackBottomLeft;
-    private Vector3 BackBottomRight;
-
-    private List<Vector3> Vertices = new List<Vector3>();
-    private List<int> Indices = new List<int>();
-
-    private void Awake()
+    private protected void Awake()
     {
         FrontTopLeft = Vector3.up * 0.5f + Vector3.left * 0.5f + Vector3.forward * 0.5f;
         FrontTopRight = Vector3.up * 0.5f + Vector3.right * 0.5f + Vector3.forward * 0.5f;
@@ -44,7 +43,7 @@ public class MyCube : MonoBehaviour
         BackBottomLeft = Vector3.down * 0.5f + Vector3.left * 0.5f + Vector3.back * 0.5f;
         BackBottomRight = Vector3.down * 0.5f + Vector3.right * 0.5f + Vector3.back * 0.5f;
     }
-    private void OnDestroy()
+    private protected void OnDestroy()
     {
         for(int i = 0; i <surroundingCells.Count;i++)
         {
@@ -52,7 +51,7 @@ public class MyCube : MonoBehaviour
             surroundingCells[i].GenerateMesh(); 
         }
     }
-    public void GenerateMesh()
+    public virtual void GenerateMesh()
     {
         Position = new Vector3(X_Index, Y_Index, Z_Index);
 
@@ -60,8 +59,10 @@ public class MyCube : MonoBehaviour
         Indices = new List<int>();
         m_UVs = new List<Vector2>();
 
+        
+
         //Front
-        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index + 1) || GetSurroundingCell(X_Index, Y_Index, Z_Index + 1).isWaterBlock)
+        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index + 1))
         { 
             Vertices.Add(FrontBottomRight);
             Vertices.Add(FrontTopRight);
@@ -72,7 +73,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Top
-        if (!SurroundingCellsContains(X_Index, Y_Index + 1,Z_Index) || GetSurroundingCell(X_Index, Y_Index + 1, Z_Index).isWaterBlock)
+        if (!SurroundingCellsContains(X_Index, Y_Index + 1,Z_Index))
         {
             Vertices.Add(FrontTopRight);
             Vertices.Add(BackTopRight);
@@ -83,7 +84,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Back
-        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index - 1) || GetSurroundingCell(X_Index, Y_Index, Z_Index - 1).isWaterBlock)
+        if (!SurroundingCellsContains(X_Index, Y_Index, Z_Index - 1))
         { 
             Vertices.Add(BackBottomLeft);
             Vertices.Add(BackTopLeft);
@@ -95,7 +96,7 @@ public class MyCube : MonoBehaviour
 
 
         //Left
-        if (!SurroundingCellsContains(X_Index - 1, Y_Index, Z_Index) || GetSurroundingCell(X_Index - 1, Y_Index, Z_Index).isWaterBlock)
+        if (!SurroundingCellsContains(X_Index - 1, Y_Index, Z_Index))
         {
             Vertices.Add(FrontBottomLeft);
             Vertices.Add(FrontTopLeft);
@@ -106,7 +107,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Right
-        if (!SurroundingCellsContains(X_Index + 1, Y_Index, Z_Index) || GetSurroundingCell(X_Index + 1, Y_Index, Z_Index).isWaterBlock)
+        if (!SurroundingCellsContains(X_Index + 1, Y_Index, Z_Index))
         {
             Vertices.Add(BackBottomRight);
             Vertices.Add(BackTopRight);
@@ -117,7 +118,7 @@ public class MyCube : MonoBehaviour
         }
 
         //Bottom
-        if (!SurroundingCellsContains(X_Index, Y_Index - 1, Z_Index) || GetSurroundingCell(X_Index, Y_Index-1, Z_Index).isWaterBlock)
+        if (!SurroundingCellsContains(X_Index, Y_Index - 1, Z_Index))
         {
             Vertices.Add(BackBottomRight);
             Vertices.Add(FrontBottomRight);
@@ -137,7 +138,7 @@ public class MyCube : MonoBehaviour
 
         GetComponent<MeshFilter>().mesh = mesh;
     }
-    private void CalculateUVs(int textureNumber)
+    private protected void CalculateUVs(int textureNumber)
     {
         float uSize = 1.0f / m_NumberOfTexturesPerRow.x;
         float vSize = 1.0f / m_NumberOfTexturesPerRow.y;
@@ -150,7 +151,7 @@ public class MyCube : MonoBehaviour
         m_UVs.Add(new Vector2(uStart + uSize, vStart + vSize));
         m_UVs.Add(new Vector2(uStart + uSize, vStart));
     }
-    private void CalculateIndices()
+    private protected void CalculateIndices()
     {
         int count = Vertices.Count;
 
@@ -173,7 +174,7 @@ public class MyCube : MonoBehaviour
         }
         return false;
     }
-    private MyCube GetSurroundingCell(int X_Index, int Y_Index, int Z_Index)
+    private protected MyCube GetSurroundingCell(int X_Index, int Y_Index, int Z_Index)
     {
         MyCube cube = null;
         for (int i = 0; i < surroundingCells.Count; i++)
