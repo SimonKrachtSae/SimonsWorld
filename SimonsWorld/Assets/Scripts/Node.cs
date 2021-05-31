@@ -15,16 +15,19 @@ public class Node : MonoBehaviour
     public Color nodeColor = Color.yellow;
 
     public bool isWaterNode;
+    private void Awake()
+    {
+        G_Cost = 10000; 
+    }
     private void Start()
     {
-        CheckIfNodeIsInWater();
-        G_Cost = 10000;
     }
     public void ConfigSurroundingNodes()
     {
-        for (int i = 0; i < NodeManager.Instance.m_nodes.Count; i++)
+        MyNodeManager myNodeManager = MyNodeManager.Instance;
+        for (int i = 0; i < myNodeManager.m_nodes.Count; i++)
         {
-            Node node = NodeManager.Instance.m_nodes[i];
+            Node node = myNodeManager.m_nodes[i];
             if (node != this )
             {
                 if((node.transform.position - this.transform.position).magnitude < 1.8f)
@@ -35,30 +38,10 @@ public class Node : MonoBehaviour
         }
         if(surroundingNodes == null)
         {
-            NodeManager.Instance.m_nodes.Remove(this);
+            myNodeManager.m_nodes.Remove(this);
             Destroy(this);
         }
-        //for (int _x = -1; _x <= 1; _x++)
-        //{
-        //    for (int _y = -1; _y <= 1; _y++)
-        //    {
-        //        for (int _z = -1; _z <= 1; _z++)
-        //        {
-        //            if (!(_x == 0 && _y == 0 && _z == 0))
-        //            {
-        //                for (int i = 0; i < NodeManager.Instance.m_nodes.Count; i++)
-        //                {
-        //                    Node node = NodeManager.Instance.m_nodes[i];
-        //                    if (node.transform.position == transform.position + new Vector3(_x, _y, _z))
-        //                    {
-        //                        surroundingNodes.Add(node);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-        //
+        
     }
 
     public void SetH_Cost(Node targetNode)

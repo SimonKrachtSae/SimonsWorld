@@ -12,37 +12,62 @@ public class PathFinding : MonoBehaviour
 
     public Node startNode;
     public Node current;
+    private MyNodeManager myNodeManager;
 
     public TargetObject targetObject;
 
-    private void FixedUpdate()
+    int pathCounter = 0;
+    private void Start()
+    {
+        myNodeManager = MyNodeManager.Instance;
+    }
+
+    private void Update()
     {
         if(targetObject.ClosestNode() != targetNode || targetNode == null)
         {
+            pathCounter = 0;
             targetNode = targetObject.ClosestNode();
 
-            for (int i = 0; i < NodeManager.Instance.m_nodes.Count; i++)
+            for (int i = 0; i < MyNodeManager.Instance.m_nodes.Count; i++)
             {
-                NodeManager.Instance.m_nodes[i].nodeColor = Color.yellow;
+                MyNodeManager.Instance.m_nodes[i].nodeColor = Color.yellow;
             }
 
-            RefreshLists();
+            Refresh();
             AStar();
         }
+
         if (Path.Count == 0)
             return;
+
+        float yDistance = Path[pathCounter].transform.position.y - transform.position.y;
+        Vector3 xzDirection = new Vector3(Path[pathCounter].transform.position.x,0, Path[pathCounter].transform.position.z) - new Vector3(transform.position.x,0, transform.position.z);
+        float xzDistance = xzDirection.magnitude;
         Vector3 direction = Vector3.zero;
-        Node closestPathNode = ClosestPathNode();
-        if (Mathf.Abs(transform.position.y - closestPathNode.transform.position.y) > 0.1f)
+
+        if (yDistance < -0.1f)
         {
-            direction = new Vector3(0, closestPathNode.transform.position.y - transform.position.y,0).normalized;
+            direction = Vector3.down;
+
+        }
+        else if(yDistance > 0.1f)
+        {
+            direction = Vector3.up;
         }
         else
         {
-            direction = (closestPathNode.transform.position - transform.position).normalized;
+            direction = xzDirection.normalized;
         }
 
+        //direction = (Path[pathCounter].transform.position - transform.position).normalized;
+
         transform.position += direction * Time.deltaTime;
+
+        if((Path[pathCounter].transform.position - transform.position).magnitude < 0.1f)
+        {
+            pathCounter++;
+        }
     }
     private void AStar()
     {
@@ -119,27 +144,34 @@ public class PathFinding : MonoBehaviour
     }
     private void SetPrevious(Node node)
     {
-
+        if(node.GetPotentialG_Cost(current) < node.G_Cost)
+        {
            node.Previous = current;
            node.SetG_Cost(current);
-        
+        }
     }
-    private void RefreshLists()
+    private void Refresh()
     {
         open = new List<Node>();
         closed = new List<Node>();
         Path = new List<Node>();
+        for(int i = 0; i < myNodeManager.m_nodes.Count; i++)
+        {
+            Node node = myNodeManager.m_nodes[i];
+            node.G_Cost = 10000;
+            node.H_Cost = 0;
+        }
     }
     private Node ClosestNode()
     {
         float closestDistance = Mathf.Infinity;
         Node closestNode = null;
-        for (int i = 0; i < NodeManager.Instance.m_nodes.Count; i++)
+        for (int i = 0; i < MyNodeManager.Instance.m_nodes.Count; i++)
         {
-            float distance = (NodeManager.Instance.m_nodes[i].transform.position - transform.position).magnitude;
+            float distance = (MyNodeManager.Instance.m_nodes[i].transform.position - transform.position).magnitude;
             if (distance < closestDistance)
             {
-                closestNode = NodeManager.Instance.m_nodes[i];
+                closestNode = MyNodeManager.Instance.m_nodes[i];
                 closestDistance = distance;
             }
         }
