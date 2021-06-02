@@ -4,12 +4,8 @@ using UnityEngine;
 
 public class MyNodeManager : MonoBehaviour
 {
-    private TerrainData terrainData;
-    private PerlinNoise perlinNoise;
-
     public static MyNodeManager Instance;
-    public List<Node> m_nodes = new List<Node>();
-    [SerializeField] private MyWorld world;
+    private List<Node> m_nodes = new List<Node>();
     [SerializeField] private GameObject nodePref;
 
     private void Awake()
@@ -23,18 +19,16 @@ public class MyNodeManager : MonoBehaviour
             Instance = this;
         }
     }
-    private void Start()
-    {
-        perlinNoise = GetComponent<PerlinNoise>();
-        terrainData = perlinNoise.terrainData;
-    }
+
     public void StartNodeManager()
     {
-        for(int x = 0; x < perlinNoise.scale; x++)
+        PerlinNoise perliNoise = PerlinNoise.Instance;
+
+        for(int x = 0; x < perliNoise.WorldSize; x++)
         {
-            for (int z = 0; z < perlinNoise.scale; z++)
+            for (int z = 0; z < perliNoise.WorldSize; z++)
             {
-                GameObject node = Instantiate(nodePref, new Vector3(x, world.heights[x, z] + 1, z), Quaternion.identity);
+                GameObject node = Instantiate(nodePref, new Vector3(x, MyWorld.Instance.GetHeight(x, z) + 1, z), Quaternion.identity);
                 m_nodes.Add(node.GetComponent<Node>());
             }
         }
@@ -47,5 +41,9 @@ public class MyNodeManager : MonoBehaviour
     public float GetDistanceBetween(Node a, Node b)
     {
         return (b.transform.position - a.transform.position).magnitude;
+    }
+    public List<Node> GetNodesInWorld()
+    {
+        return m_nodes;
     }
 }

@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class PathFinding : MonoBehaviour
 {
-    public List<Node> open;
-    public List<Node> closed;
-    public List<Node> Path;
+    private GameObject targetObject;
+    private Node targetNode;
+    private Node current;
 
-    public Node targetNode;
+    private List<Node> open;
+    private List<Node> closed;
+    private List<Node> Path;
 
-    public Node startNode;
-    public Node current;
     private MyNodeManager myNodeManager;
 
-    public TargetObject targetObject;
-
-    int pathCounter = 0;
+    private int pathCounter = 0;
+    private float moveSpeed;
     private void Start()
     {
         myNodeManager = MyNodeManager.Instance;
@@ -24,55 +23,57 @@ public class PathFinding : MonoBehaviour
 
     private void Update()
     {
-        if(targetObject.ClosestNode() != targetNode || targetNode == null)
+        if (targetObject == null)
+            return;
+        Node closestToTarget = GetClosestNodeToTarget();
+        if(closestToTarget != targetNode || targetNode == null)
         {
+            RefreshLists();
             pathCounter = 0;
-            targetNode = targetObject.ClosestNode();
-
-            for (int i = 0; i < MyNodeManager.Instance.m_nodes.Count; i++)
-            {
-                MyNodeManager.Instance.m_nodes[i].nodeColor = Color.yellow;
-            }
-
-            Refresh();
+            targetNode = closestToTarget;
             AStar();
+            RefreshNodes();
         }
 
         if (Path.Count == 0)
             return;
 
-        float yDistance = Path[pathCounter].transform.position.y - transform.position.y;
-        Vector3 xzDirection = new Vector3(Path[pathCounter].transform.position.x,0, Path[pathCounter].transform.position.z) - new Vector3(transform.position.x,0, transform.position.z);
-        float xzDistance = xzDirection.magnitude;
-        Vector3 direction = Vector3.zero;
+        RotateTowards(transform, Path[pathCounter].transform, 2);
 
-        if (yDistance < -0.1f)
-        {
-            direction = Vector3.down;
+        transform.position += TargetDirection() * Time.deltaTime * moveSpeed;
 
-        }
-        else if(yDistance > 0.1f)
-        {
-            direction = Vector3.up;
-        }
-        else
-        {
-            direction = xzDirection.normalized;
-        }
+        if ((Path[pathCounter].transform.position - targetNode.transform.position).magnitude < 0.1f)
+            return;
 
-        //direction = (Path[pathCounter].transform.position - transform.position).normalized;
-
-        transform.position += direction * Time.deltaTime;
-
-        if((Path[pathCounter].transform.position - transform.position).magnitude < 0.1f)
+        if((Path[pathCounter].transform.position - transform.position).magnitude < 0.2f)
         {
             pathCounter++;
         }
     }
+    private void RefreshNodes()
+    {
+        List<Node> nodesInWorld = myNodeManager.GetNodesInWorld();
+        for (int i = 0; i < nodesInWorld.Count; i++)
+        {
+            nodesInWorld[i].nodeColor = Color.yellow;
+        }
+        for (int i = 0; i < nodesInWorld.Count; i++)
+        {
+            Node node = nodesInWorld[i];
+            node.SetG_Cost(10000);
+            node.SetH_Cost(0);
+        }
+    }
+    private void RefreshLists()
+    {
+        open = new List<Node>();
+        closed = new List<Node>();
+        Path = new List<Node>();
+    }
     private void AStar()
     {
-        startNode = ClosestNode();
-        startNode.G_Cost = 0;
+        Node startNode = ClosestNode();
+        startNode.SetG_Cost(0);
         current = startNode;
         int counter = 1000;
         while(true)
@@ -86,7 +87,7 @@ public class PathFinding : MonoBehaviour
             if (current == targetNode)
             {
                 closed.Add(targetNode);
-                BackTrace();
+                BackTrace(startNode);
                 RewindPath();
 
                 break;
@@ -128,7 +129,7 @@ public class PathFinding : MonoBehaviour
             {
                 SetPrevious(current.surroundingNodes[i]);
 
-                current.surroundingNodes[i].SetH_Cost(targetNode);
+                current.surroundingNodes[i].SetH_CostRelativeTo(targetNode);
                 AddToOpen(current.surroundingNodes[i]);
             }
         }
@@ -144,34 +145,23 @@ public class PathFinding : MonoBehaviour
     }
     private void SetPrevious(Node node)
     {
-        if(node.GetPotentialG_Cost(current) < node.G_Cost)
+        if (node.GetPotentialG_Cost(current) < node.GetG_Cost())
         {
-           node.Previous = current;
-           node.SetG_Cost(current);
-        }
-    }
-    private void Refresh()
-    {
-        open = new List<Node>();
-        closed = new List<Node>();
-        Path = new List<Node>();
-        for(int i = 0; i < myNodeManager.m_nodes.Count; i++)
-        {
-            Node node = myNodeManager.m_nodes[i];
-            node.G_Cost = 10000;
-            node.H_Cost = 0;
+           node.SetPrevious(current);
+           node.SetG_CostRealtiveTo(current);
         }
     }
     private Node ClosestNode()
     {
         float closestDistance = Mathf.Infinity;
         Node closestNode = null;
-        for (int i = 0; i < MyNodeManager.Instance.m_nodes.Count; i++)
+        List<Node> nodesInWorld = myNodeManager.GetNodesInWorld();
+        for (int i = 0; i < nodesInWorld.Count; i++)
         {
-            float distance = (MyNodeManager.Instance.m_nodes[i].transform.position - transform.position).magnitude;
+            float distance = (nodesInWorld[i].transform.position - transform.position).magnitude;
             if (distance < closestDistance)
             {
-                closestNode = MyNodeManager.Instance.m_nodes[i];
+                closestNode = nodesInWorld[i];
                 closestDistance = distance;
             }
         }
@@ -187,7 +177,7 @@ public class PathFinding : MonoBehaviour
 
         Path = rewindedPath;
     }
-    private void BackTrace()
+    private void BackTrace(Node startNode)
     {
         Node lastNode = targetNode;
         int counter = 1000;
@@ -195,32 +185,76 @@ public class PathFinding : MonoBehaviour
         {
             if (counter <= 1)
                break;
+
             counter--;
             lastNode.nodeColor = Color.blue;
             Path.Add(lastNode);
-            lastNode = lastNode.Previous;
+            lastNode = lastNode.GetPrevious();
+
         }
+        Path.Add(startNode);
     }
-    private Node ClosestPathNode()
+    public void SetMoveSpeed(float _moveSpeed)
     {
-        float closestDistance = Mathf.Infinity;
+        moveSpeed = _moveSpeed;
+    }
+    public void SetDestination(GameObject target)
+    {
+        targetObject = target;
+    }
+    public GameObject GetDestination()
+    {
+        return targetObject;
+    }
+    private Node GetClosestNodeToTarget()
+    {
+        float closestDistance = 10000f;
         Node closestNode = null;
-        for (int i = 0; i < Path.Count; i++)
+        List<Node> nodesInWorld = myNodeManager.GetNodesInWorld();
+        for (int i = 0; i < nodesInWorld.Count; i++)
         {
-            float distance = (Path[i].transform.position - transform.position).magnitude;
+            float distance = (nodesInWorld[i].transform.position - targetObject.transform.position).magnitude;
             if (distance < closestDistance)
             {
-                if (i < Path.Count - 1)
-                {
-                    closestNode = Path[i + 1];
-                }
-                else
-                {
-                    closestNode = Path[i];
-                }
+                closestNode = nodesInWorld[i];
                 closestDistance = distance;
             }
         }
         return closestNode;
+    }
+    private float YTargetDistance()
+    {
+        return Path[pathCounter].transform.position.y - transform.position.y;
+    }
+    private Vector3 TargetDirection()
+    {
+        Vector3 direction = Vector3.zero;
+
+        if (YTargetDistance() > 0.1f)
+        {
+            direction = Vector3.up;
+        }
+        else if(XZTargetDirection().magnitude >= 0.1f)
+        {
+            direction = XZTargetDirection().normalized;
+        }
+        else if (YTargetDistance() < -0.1f)
+        {
+            direction = Vector3.down;
+
+        }
+        return direction;
+    }
+    private Vector3 XZTargetDirection()
+    {
+        return new Vector3(Path[pathCounter].transform.position.x, 0, Path[pathCounter].transform.position.z) - new Vector3(transform.position.x, 0, transform.position.z);
+    }
+    private protected void RotateTowards(Transform transform, Transform target, float speed)
+    {
+        Vector3 targetDirection = new Vector3(target.position.x - transform.position.x,0, target.position.z - transform.position.z);
+        float singleStep = speed * Time.deltaTime;
+        Vector3 newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
+        Debug.DrawRay(transform.position, newDirection, Color.red);
+        transform.rotation = Quaternion.LookRotation(newDirection);
     }
 }

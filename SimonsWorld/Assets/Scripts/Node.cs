@@ -4,30 +4,25 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
-    public bool Closed = false;
     public List<Node> surroundingNodes = new List<Node>();
 
-    public float H_Cost;
-    public float G_Cost = 10000;
+    private float H_Cost;
+    private float G_Cost;
     public float F_Cost { get => H_Cost + G_Cost; }
 
-    public Node Previous;
+    private Node Previous;
     public Color nodeColor = Color.yellow;
-
-    public bool isWaterNode;
     private void Awake()
     {
-        G_Cost = 10000; 
-    }
-    private void Start()
-    {
+        SetG_Cost(10000); 
     }
     public void ConfigSurroundingNodes()
     {
         MyNodeManager myNodeManager = MyNodeManager.Instance;
-        for (int i = 0; i < myNodeManager.m_nodes.Count; i++)
+        List<Node> nodesInWorld = myNodeManager.GetNodesInWorld();
+        for (int i = 0; i < nodesInWorld.Count; i++)
         {
-            Node node = myNodeManager.m_nodes[i];
+            Node node = nodesInWorld[i];
             if (node != this )
             {
                 if((node.transform.position - this.transform.position).magnitude < 1.8f)
@@ -38,30 +33,21 @@ public class Node : MonoBehaviour
         }
         if(surroundingNodes == null)
         {
-            myNodeManager.m_nodes.Remove(this);
+            nodesInWorld.Remove(this);
             Destroy(this);
         }
         
     }
 
-    public void SetH_Cost(Node targetNode)
-    {
-        float value = (targetNode.transform.position - transform.position).magnitude;
-        H_Cost = value;
-    }
-    public void SetG_Cost(Node node)
-    {
-        
-        float value = (node.transform.position - transform.position).magnitude;
-        value += node.G_Cost;
-        
-        G_Cost = value;
-    }
     public void SetPrevious(Node node)
     {
         Previous = node;
     }
-   
+    public Node GetPrevious()
+    {
+        return Previous;
+    }
+
     public float GetPotentialG_Cost(Node potPrevious)
     {
         float value;
@@ -74,32 +60,42 @@ public class Node : MonoBehaviour
     {
         for(int i = 0; i < surroundingNodes.Count; i++)
         {
-            surroundingNodes[i].SetH_Cost(targetNode);
-            surroundingNodes[i].SetG_Cost(Previous);
+            surroundingNodes[i].SetH_CostRelativeTo(targetNode);
+            surroundingNodes[i].SetG_CostRealtiveTo(Previous);
         }
+    }
+    public void SetH_CostRelativeTo(Node targetNode)
+    {
+        float value = (targetNode.transform.position - transform.position).magnitude;
+        H_Cost = value;
+    }
+    public void SetG_CostRealtiveTo(Node node)
+    {
+        
+        float value = (node.transform.position - transform.position).magnitude;
+        value += node.G_Cost;
+        
+        G_Cost = value;
+    }
+    public void SetG_Cost(float value)
+    {
+        G_Cost = value;
+    }
+    public void SetH_Cost(float value)
+    {
+        H_Cost = value;
+    }
+    public float GetG_Cost()
+    {
+        return G_Cost;
+    }
+    public float GetHCost()
+    {
+        return H_Cost;
     }
     private void OnDrawGizmos()
     {
         Gizmos.color = nodeColor;
         Gizmos.DrawSphere(transform.position, 0.1f);
-    }
-    private void CheckIfNodeIsInWater()
-    {
-        for (int x = 0; x < MyCellularWorld.Instance.m_WorldSizeX; x++)
-        {
-            for (int y = 0; y < MyCellularWorld.Instance.m_WorldSizeY; y++)
-            {
-                for (int z = 0; z < MyCellularWorld.Instance.m_WorldSizeZ; z++)
-                {
-                    if(transform.position == MyCellularWorld.Instance.m_Cubes[x,y,z].transform.position)
-                    {
-                        if(MyCellularWorld.Instance.M_World[x,y,z] == 1)
-                        {
-                            isWaterNode = true;
-                        }
-                    }
-                }
-            }
-        }
     }
 }
