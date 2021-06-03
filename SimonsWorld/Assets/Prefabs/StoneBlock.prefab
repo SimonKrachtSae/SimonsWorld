@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7256229971129562348}
   m_Layer: 0
   m_Name: StoneBlock
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -53,6 +53,7 @@ MonoBehaviour:
   X_Index: 0
   Y_Index: 0
   Z_Index: 0
+  Position: {x: 0, y: 0, z: 0}
 --- !u!33 &129749279852646275
 MeshFilter:
   m_ObjectHideFlags: 0

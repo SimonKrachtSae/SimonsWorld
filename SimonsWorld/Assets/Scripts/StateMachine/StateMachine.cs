@@ -29,13 +29,14 @@ public class StateMachine : MonoBehaviour
                 SwitchCurrentState(followState);
             }
         }
-        if(!PlayerIsInRange())
+        else
         {
             if(currentState is FollowState)
             {
                 SwitchCurrentState(wanderState);
             }
         }
+
         currentState.RunState();
     }
     private void SwitchCurrentState(State nextState)

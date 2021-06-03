@@ -5,8 +5,11 @@ using UnityEngine;
 public class MyNodeManager : MonoBehaviour
 {
     public static MyNodeManager Instance;
-    private List<Node> m_nodes = new List<Node>();
+    private List<Node> m_nodes;
+    private List<GameObject> m_nodeObjs;
     [SerializeField] private GameObject nodePref;
+
+    MyWorld world;
 
     private void Awake()
     {
@@ -22,16 +25,35 @@ public class MyNodeManager : MonoBehaviour
 
     public void StartNodeManager()
     {
-        PerlinNoise perliNoise = PerlinNoise.Instance;
-
-        for(int x = 0; x < perliNoise.WorldSize; x++)
+        if(m_nodeObjs != null)
         {
-            for (int z = 0; z < perliNoise.WorldSize; z++)
+            for(int i = 0; i < m_nodeObjs.Count; i++)
             {
-                GameObject node = Instantiate(nodePref, new Vector3(x, MyWorld.Instance.GetHeight(x, z) + 1, z), Quaternion.identity);
-                m_nodes.Add(node.GetComponent<Node>());
+                Destroy(m_nodeObjs[i]);
             }
         }
+
+        m_nodes = new List<Node>();
+        m_nodeObjs = new List<GameObject>();
+        world = MyWorld.Instance;
+        PerlinNoise perliNoise = PerlinNoise.Instance;
+        TerrainData terrainData = perliNoise.GetTerrainData();
+        int scale = perliNoise.WorldSize;
+
+        for(int x = 0; x < scale; x++)
+        {
+            for (int z = 0; z < scale; z++)
+            {
+                for (int y = 0; y < scale; y++)
+                {
+                    if (world.world[x, y, z] == 1)
+                    {
+                        CreateNode(new Vector3(x,y,z));
+                    }
+                }
+            }
+        }
+        
 
         for (int i = 0; i < m_nodes.Count; i++)
         {
@@ -45,5 +67,24 @@ public class MyNodeManager : MonoBehaviour
     public List<Node> GetNodesInWorld()
     {
         return m_nodes;
+    }
+    public void CreateNode(Vector3 position)
+    {
+        GameObject nodeObj = Instantiate(nodePref, position, Quaternion.identity);
+        Node node = nodeObj.GetComponent<Node>();
+        m_nodes.Add(node);
+        m_nodeObjs.Add(nodeObj);
+    }
+    public Node GetNodeAtPosition(Vector3 position)
+    {
+        Node node = null;
+        for (int i = 0; i < m_nodes.Count; i++)
+        {
+            if ((m_nodes[i].transform.position - position).magnitude < 0.1f)
+            {
+                node = m_nodes[i];
+            }
+        }
+        return node;
     }
 }

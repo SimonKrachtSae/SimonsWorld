@@ -25,7 +25,7 @@ public class WanderState : State
     }
     public override void EndState()
     {
-        //pathfinding.SetDestination(this.gameObject);
+        pathfinding.SetDestination(null);
         pathfinding.SetMoveSpeed(0);
     }
     private GameObject RandomDestination()

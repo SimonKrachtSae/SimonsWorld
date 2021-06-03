@@ -14,9 +14,19 @@ public class MyWaterCube : MyCube
         m_UVs = new List<Vector2>();
 
 
-
+        MyWorld world = MyWorld.Instance;
         //Front
-        if (!SurroundingWaterCellsContains(X_Index, Y_Index, Z_Index + 1))
+        if (Z_Index + 1 < world.scale)
+            if (world.world[X_Index, Y_Index, Z_Index + 1] != 5)
+        {
+            Vertices.Add(FrontBottomRight);
+            Vertices.Add(FrontTopRight);
+            Vertices.Add(FrontTopLeft);
+            Vertices.Add(FrontBottomLeft);
+            CalculateIndices();
+            CalculateUVs(m_NumberOfTexture[0]);
+        }
+        if(Z_Index == world.scale - 1)
         {
             Vertices.Add(FrontBottomRight);
             Vertices.Add(FrontTopRight);
@@ -27,7 +37,17 @@ public class MyWaterCube : MyCube
         }
 
         //Top
-        if (!SurroundingWaterCellsContains(X_Index, Y_Index + 1, Z_Index))
+        if (Y_Index + 1 < world.scale)
+            if (world.world[X_Index, Y_Index + 1, Z_Index] != 5)
+        {
+            Vertices.Add(FrontTopRight);
+            Vertices.Add(BackTopRight);
+            Vertices.Add(BackTopLeft);
+            Vertices.Add(FrontTopLeft);
+            CalculateIndices();
+            CalculateUVs(m_NumberOfTexture[1]);
+        }
+        if (Y_Index == world.scale - 1)
         {
             Vertices.Add(FrontTopRight);
             Vertices.Add(BackTopRight);
@@ -38,7 +58,8 @@ public class MyWaterCube : MyCube
         }
 
         //Back
-        if (!SurroundingWaterCellsContains(X_Index, Y_Index, Z_Index - 1))
+        if (Z_Index - 1 >= 0)
+            if (world.world[X_Index, Y_Index, Z_Index - 1] != 5)
         {
             Vertices.Add(BackBottomLeft);
             Vertices.Add(BackTopLeft);
@@ -48,9 +69,28 @@ public class MyWaterCube : MyCube
             CalculateUVs(m_NumberOfTexture[2]);
         }
 
+        if (Z_Index == 0 )
+        {
+            Vertices.Add(BackBottomLeft);
+            Vertices.Add(BackTopLeft);
+            Vertices.Add(BackTopRight);
+            Vertices.Add(BackBottomRight);
+            CalculateIndices();
+            CalculateUVs(m_NumberOfTexture[2]);
+        }
 
         //Left
-        if (!SurroundingWaterCellsContains(X_Index - 1, Y_Index, Z_Index))
+        if (X_Index - 1 >= 0)
+            if (world.world[X_Index - 1, Y_Index, Z_Index] != 5)
+            {
+            Vertices.Add(FrontBottomLeft);
+            Vertices.Add(FrontTopLeft);
+            Vertices.Add(BackTopLeft);
+            Vertices.Add(BackBottomLeft);
+            CalculateIndices();
+            CalculateUVs(m_NumberOfTexture[3]);
+        }
+        if (X_Index == 0)
         {
             Vertices.Add(FrontBottomLeft);
             Vertices.Add(FrontTopLeft);
@@ -60,8 +100,18 @@ public class MyWaterCube : MyCube
             CalculateUVs(m_NumberOfTexture[3]);
         }
 
-        //Right
-        if (!SurroundingWaterCellsContains(X_Index + 1, Y_Index, Z_Index))
+            //Right
+            if (X_Index + 1 < world.scale)
+            if (world.world[X_Index + 1, Y_Index, Z_Index] != 5)
+            {
+            Vertices.Add(BackBottomRight);
+            Vertices.Add(BackTopRight);
+            Vertices.Add(FrontTopRight);
+            Vertices.Add(FrontBottomRight);
+            CalculateIndices();
+            CalculateUVs(m_NumberOfTexture[4]);
+        }
+        if (X_Index == world.scale - 1)
         {
             Vertices.Add(BackBottomRight);
             Vertices.Add(BackTopRight);
@@ -72,7 +122,17 @@ public class MyWaterCube : MyCube
         }
 
         //Bottom
-        if (!SurroundingWaterCellsContains(X_Index, Y_Index - 1, Z_Index))
+        if (Y_Index - 1 >= 0)
+            if (world.world[X_Index, Y_Index - 1, Z_Index] != 5)
+            {
+            Vertices.Add(BackBottomRight);
+            Vertices.Add(FrontBottomRight);
+            Vertices.Add(FrontBottomLeft);
+            Vertices.Add(BackBottomLeft);
+            CalculateIndices();
+            CalculateUVs(m_NumberOfTexture[5]);
+        }
+        if (Y_Index == 0)
         {
             Vertices.Add(BackBottomRight);
             Vertices.Add(FrontBottomRight);
@@ -81,7 +141,8 @@ public class MyWaterCube : MyCube
             CalculateIndices();
             CalculateUVs(m_NumberOfTexture[5]);
         }
-        Mesh mesh = new Mesh();
+
+            Mesh mesh = new Mesh();
 
         mesh.vertices = Vertices.ToArray();
         mesh.triangles = Indices.ToArray();

@@ -15,7 +15,10 @@ public class MyCube : MonoBehaviour
     public int X_Index;
     public int Y_Index;
     public int Z_Index;
-          
+
+    public bool hasNode = false;
+    public Node nodeOnTop;
+
     public  Vector3 Position;
             
     private protected Vector3 FrontTopLeft;
