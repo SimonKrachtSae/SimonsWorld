@@ -6,8 +6,10 @@ public class WanderState : State
 {
     private float moveSpeed;
     private PathFinding pathfinding;
-    public WanderState(float _moveSpeed, PathFinding _pathFinding)
+    private CreeperAi creeperAi;
+    public WanderState(float _moveSpeed, PathFinding _pathFinding, CreeperAi _creeperAi)
     {
+        creeperAi = _creeperAi;
         pathfinding = _pathFinding;
         moveSpeed = _moveSpeed;
     }
@@ -18,9 +20,14 @@ public class WanderState : State
     }
     public override void RunState()
     {
+        if (pathfinding.GetDestination() == null)
+        {
+            pathfinding.SetDestination(RandomDestination());
+        }
+            
         if((pathfinding.transform.position - pathfinding.GetDestination().transform.position).magnitude < 0.2f)
         {
-            pathfinding.SetDestination(RandomDestination()); 
+            creeperAi.SetDestinationReached(true);
         }
     }
     public override void EndState()
@@ -30,7 +37,8 @@ public class WanderState : State
     }
     private GameObject RandomDestination()
     {
-        List<Node> worldNodes = MyNodeManager.Instance.GetNodesInWorld();
+        MyNodeManager nodeManager = MyNodeManager.Instance;
+        List<Node> worldNodes = nodeManager.GetNodesInWorld();
         int randomIndex = Random.Range(0, worldNodes.Count - 1);
         return worldNodes[randomIndex].gameObject;
     }

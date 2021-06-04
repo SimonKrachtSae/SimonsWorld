@@ -5,11 +5,17 @@ using UnityEngine;
 public class MyWorld : MonoBehaviour
 {
     public static MyWorld Instance;
+    [SerializeField] private GameObject CreeperPref;
+    private float spawnTimer = 0;
+    private List<Vector3> SpawnPoints;
+
+    [SerializeField] private GameObject PlayerPref;
 
     [SerializeField] private GameObject m_EarthBlock;
     [SerializeField] private GameObject m_WaterBlock;
     [SerializeField] private GameObject m_SandBlock;
     [SerializeField] private GameObject m_StoneBlock;
+    [SerializeField] private GameObject m_SpawnerBlock;
 
     [SerializeField] private int waterLevel = 3;
 
@@ -19,11 +25,12 @@ public class MyWorld : MonoBehaviour
     public int[,,] world;
     public MyCube[,,] WorldCubes;
     public MyCube[,,] waterWorldCubes;
-    List<MyCube>blocks = new List<MyCube>();
-    List<GameObject> boxes = new List<GameObject>();
+    private List<MyCube>blocks = new List<MyCube>();
+    private List<GameObject> boxes = new List<GameObject>();
     public int scale;
-    List<MyWaterCube> waterCubes;
-    TerrainData terrainData;
+    private List<MyWaterCube> waterCubes;
+    private TerrainData terrainData;
+    private int StoneLevel;
     private void Awake()
     {
         if (Instance != null)
@@ -37,6 +44,14 @@ public class MyWorld : MonoBehaviour
     }
     private void Start()
     {
+
+        int seed = (int)System.DateTime.Now.Ticks;
+
+        UnityEngine.Random.InitState(seed);
+        waterLevel = UnityEngine.Random.Range(2, 5);
+        StoneLevel = UnityEngine.Random.Range(10, 14);
+
+
         PerlinNoise perliNoise = PerlinNoise.Instance;
         waterCubes = new List<MyWaterCube>();
         terrainData = perliNoise.GetTerrainData();
@@ -58,27 +73,38 @@ public class MyWorld : MonoBehaviour
                     //3 = stoneBlock
                     //4 = sandBlock
                     //5 = waterBlock 
+                    //6 = spawner
                     if (y == Mathf.RoundToInt(terrainData.GetHeight(x, z)))
                     {
-                        if (y > waterLevel)
+                        if (y > waterLevel && y < waterLevel + StoneLevel)
                         {
                             CreateCube(m_EarthBlock, x, y, z);
                             world[x, y, z] = 2;
                         }
-                        if (y <= waterLevel)
+                        else if (y <= waterLevel)
                         { 
                             CreateCube(m_SandBlock, x, y, z);
                             world[x, y, z] = 4;
                         }
+                        else if(y >= waterLevel + StoneLevel)
+                        {
+                            CreateCube(m_StoneBlock, x, y, z);
+                            world[x, y, z] = 3;
+                        }
+
                         for (int i = 0; i < y; i++)
                         {
-                            if(i > waterLevel)
+                            if(i > waterLevel && i < waterLevel + StoneLevel)
                             {
                                 world[x, i, z] = 2;
                             }
-                            if(i <= waterLevel)
+                            else if(i <= waterLevel)
                             {
                                 world[x, i, z] = 4;
+                            }
+                            else if(i >= waterLevel + StoneLevel)
+                            {
+                                world[x, i, z] = 3;
                             }
                         }
                     }
@@ -91,36 +117,11 @@ public class MyWorld : MonoBehaviour
                         world[x, y, z] = 0;
                     }
                 }
-                //heights[x,z] = Mathf.RoundToInt(terrainData.GetHeight(x, z));
-                //
-                //if(heights[x,z] > waterLevel)
-                //{
-                //    int value = Random.Range(0, 100);
-                //
-                //    if(value >= StoneBlockFillPercent)
-                //    {
-                //        CreateCube(m_EarthBlock, x, heights[x,z], z);
-                //    }
-                //    else if (value < StoneBlockFillPercent)
-                //    {
-                //        CreateCube(m_StoneBlock, x, heights[x, z], z);
-                //    }
-                //}
-                //if(heights[x,z] <= waterLevel)
-                //{
-                //    CreateCube(m_SandBlock, x, heights[x, z], z);
-                //}
-                //for(int i = 0; i <= heights[x,z];i++)
-                //{
-                //    if(heights[x,z] < scale)
-                //    world[x, i, z] = 1;
-                //}
             }
         }
         FillHoles();
-        //SpawnWaterCubes();
-        //GenerateWaterWorld();
         GenerateWaterCubes(terrainData);
+        ConfigSpawnPoints();
         for (int x = 0; x < scale; x++)
         {
             for (int y = 0; y < scale; y++)
@@ -146,18 +147,49 @@ public class MyWorld : MonoBehaviour
             }
         }
 
-        //for(int i=0; i < blocks.Count; i++)
-        //{
-        //    SetSurroundingCells(blocks[i]);
-        //    blocks[i].GenerateMesh();
-        //}
-        //for (int i = 0; i < waterCubes.Count; i++)
-        //{
-        //    SetSurroundingWaterCells(waterCubes[i], waterCubes);
-        //    waterCubes[i].GenerateMesh();
-        //}
         MyNodeManager.Instance.StartNodeManager();
-        //StaticBatchingUtility.Combine(boxes.ToArray(), gameObject);
+        StaticBatchingUtility.Combine(boxes.ToArray(), gameObject);
+        SpawnPlayer();
+    }
+    private void Update()
+    {
+        SpawnCreepers();
+    }
+    void ConfigSpawnPoints()
+    {
+        SpawnPoints = new List<Vector3>();
+        SpawnPoints.Add(new Vector3(0,Mathf.RoundToInt(terrainData.GetHeight(0,0)) + 2,0));
+        SpawnPoints.Add(new Vector3(scale - 1,Mathf.RoundToInt(terrainData.GetHeight(scale -1,scale - 1)) + 2, scale - 1));
+        SpawnPoints.Add(new Vector3(scale - 1,Mathf.RoundToInt(terrainData.GetHeight(scale - 1,0)) + 2,0));
+        SpawnPoints.Add(new Vector3(0,Mathf.RoundToInt(terrainData.GetHeight(0,scale - 1)) + 2,scale - 1));
+
+        world[0, Mathf.RoundToInt(terrainData.GetHeight(0, 0))+1,0] = 6;
+        world[scale - 1, Mathf.RoundToInt(terrainData.GetHeight(scale - 1, 0)) + 1,0] = 6;
+        world[scale - 1, Mathf.RoundToInt(terrainData.GetHeight(scale - 1, scale - 1)) + 1,scale - 1] = 6;
+        world[0, Mathf.RoundToInt(terrainData.GetHeight(0, scale - 1)) + 1,scale - 1] = 6;
+
+        CreateCube(m_SpawnerBlock, 0, Mathf.RoundToInt(terrainData.GetHeight(0, 0)) + 1, 0);
+        CreateCube(m_SpawnerBlock, scale - 1, Mathf.RoundToInt(terrainData.GetHeight(scale - 1, 0)) + 1, 0);
+        CreateCube(m_SpawnerBlock, scale - 1, Mathf.RoundToInt(terrainData.GetHeight(scale - 1,  scale - 1)) + 1,  scale - 1);
+        CreateCube(m_SpawnerBlock, 0, Mathf.RoundToInt(terrainData.GetHeight(0, scale - 1)) + 1, scale - 1);
+    }
+    void SpawnPlayer()
+    {
+        int halfScale = Mathf.RoundToInt(scale / 2.0f);
+        Vector3 spawnPoint = new Vector3(halfScale, terrainData.GetHeight(halfScale, halfScale) + 2, halfScale);
+        Instantiate(PlayerPref, spawnPoint, Quaternion.identity);
+    }
+    void SpawnCreepers()
+    {
+        spawnTimer -= Time.fixedDeltaTime;
+
+        if(spawnTimer <= 0.0f)
+        {
+            int randIndex = Random.Range(0, 3);
+            Instantiate(CreeperPref, SpawnPoints[randIndex], Quaternion.identity);
+            spawnTimer = 7;
+        }
+        Debug.Log(spawnTimer);
     }
     void ConfigSurroundingCells(int _x, int _y, int _z)
     {
@@ -201,23 +233,6 @@ public class MyWorld : MonoBehaviour
             }
         }
     }
-
-    void GenerateWaterWorld()
-    {
-        for (int x = 0; x < scale; x++)
-        {
-            for (int z = 0; z < scale; z++)
-            {
-                for (int y = 0; y < scale; y++)
-                {
-                    if (world[x, y, z] == 5)
-                    {
-                        CreateWaterCube(m_WaterBlock, x, y, z);
-                    }
-                }
-            }
-        }
-    }
     public int GetHeight(int x, int z)
     {
         return heights[x, z];
@@ -240,35 +255,21 @@ public class MyWorld : MonoBehaviour
                             //world[x, y - i, z] = 2;
                             CreateCube(m_EarthBlock, x, y-i, z);
                         }
-                        if (world[x, y - i, z] == 4)
+                        else if (world[x, y - i, z] == 4)
                         {
                             //world[x, y-i, z] = 4;
                             CreateCube(m_SandBlock, x, y-i, z);
+                        }
+                        else if (world[x, y - i, z] == 3)
+                        {
+                            //world[x, y-i, z] = 4;
+                            CreateCube(m_StoneBlock, x, y - i, z);
                         }
                     }
                 }
                 
             }
         }
-        //for (int x = 0; x < scale; x++)
-        //{
-        //    for(int z = 0; z < scale; z++)
-        //    {
-        //        if (heights[x, z] > 0)
-        //        {
-        //            int offset = GetLowestNeighbourCubeDistance(x,z, scale);
-        //            if(offset >= 1)
-        //            {
-        //                for(int y = 1; y <= offset; y++)
-        //                {
-        //                    if(heights[x,z] - y >= 0)
-        //                    CreateCube(m_EarthBlock, x, heights[x, z] - y, z);
-        //                }
-        //            }
-        //        }
-        //
-        //    }
-        //}
     }
     
     private void ConfigureWorld()
@@ -328,75 +329,7 @@ public class MyWorld : MonoBehaviour
         }
         return offset;
     }
-    private int GetLowestNeighbourCubeDistance(int _x, int _z, int scale)
-    {
-        int offset = 100;
-        int value = 0;
-        for (int x = -1; x <= 1; x++)
-        {
-            if(x != 0)
-            {
-                if(_x + x >= 0 &&_x + x < scale)
-                {
-                    if (heights[_x, _z] > heights[_x + x, _z])
-                    {
-                        value = Mathf.Abs(heights[_x + x, _z] - heights[_x, _z]);
-                        if(value < offset)
-                        {
-                            offset = value;
-                        }
-                    }
-                }
-            }
-        }
-        for (int z = -1; z <= 1; z++)
-        {
-            if (z != 0)
-            {
-                if (_z + z >= 0 && _z + z < scale)
-                {
-                    
-                    if (heights[_x, _z] > heights[_x, _z + z])
-                    {
-                        value = Mathf.Abs(heights[_x, _z + z] - heights[_x, _z]);
-                        if (value < offset)
-                        {
-                            offset = value;
-                        }
-                    }
-                }
-            }
 
-        }
-        if(offset == 100)
-        {
-            offset = 0;
-            return offset;
-        }
-        return offset + 1;
-    }
-    private void SpawnWaterCubes()
-    {
-        for (int x = 0; x < scale; x++)
-        {
-            for (int z = 0; z < scale; z++)
-            {
-                for (int y = 0; y < scale; y++)
-                {
-                    if(world[x,y,z] == 2 || world[x, y, z] == 3 || world[x, y, z] == 4)
-                    {
-                        if(y < waterLevel)
-                        {
-                            for(int i = y; i <= waterLevel; y++)
-                            {
-                                CreateWaterCube(m_WaterBlock, x, y, z);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
     private void GenerateWaterCubes(TerrainData terrainData)
     {
         for(int x = 0; x < scale; x++)
@@ -431,21 +364,6 @@ public class MyWorld : MonoBehaviour
         block.isStatic = true;
         boxes.Add(block);
     }
-    private MyCube CreateNewCube(GameObject cube, int x, int y, int z)
-    {
-        GameObject block = Instantiate(cube, new Vector3(x, y, z), Quaternion.identity, this.transform);
-        MyCube myCube = block.GetComponent<MyCube>();
-        myCube.X_Index = x;
-        myCube.Y_Index = y;
-        myCube.Z_Index = z;
-        waterWorldCubes[x, y, z] = myCube;
-
-        //blocks.Add(myCube);
-        block.isStatic = true;
-        boxes.Add(block);
-        //myCube.GenerateMesh();
-        return myCube;
-    }
     private void CreateWaterCube(GameObject waterCube, int x, int y, int z)
     {
         GameObject block = Instantiate(waterCube, new Vector3(x, y, z), Quaternion.identity, this.transform);
@@ -458,37 +376,7 @@ public class MyWorld : MonoBehaviour
         block.isStatic = true;
         boxes.Add(block);
     }
-    private void SetSurroundingCells(MyCube cube)
-    {
-        cube.surroundingCells = new List<MyCube>();
-        for(int i = 0; i < blocks.Count; i++)
-        {
-            if((blocks[i].transform.position - cube.transform.position).magnitude < 1.8f)
-            {
-                if(cube != blocks[i])
-                {
-                    if(!cube.surroundingCells.Contains(blocks[i]))
-                    {
-                        cube.surroundingCells.Add(blocks[i]);
-                    }
-                }
-            }
-        }
-    }
-    private void SetSurroundingWaterCells(MyWaterCube cube, List<MyWaterCube> myWaterCubes)
-    {
-        cube.surroundingWaterCubes = new List<MyWaterCube>();
-        for (int i = 0; i < myWaterCubes.Count; i++)
-        {
-            if ((myWaterCubes[i].transform.position - cube.transform.position).magnitude < 1.8f)
-            {
-                if (cube != myWaterCubes[i])
-                {
-                    cube.surroundingWaterCubes.Add(myWaterCubes[i]);
-                }
-            }
-        }
-    }
+
     public void DestroyBlock(MyCube cube)
     {
         MyNodeManager nodeManager = MyNodeManager.Instance;
@@ -597,17 +485,6 @@ public class MyWorld : MonoBehaviour
             }
         }
         MyNodeManager.Instance.StartNodeManager();
-    }
-    private int HighestCube(int _x, int _y, int _z)
-    {
-        for (int i = _y - 1 ; i >= 0; i++)
-        {
-            if(world[_x, i, _z] == 2 || world[_x, i, _z] == 3 || world[_x, i, _z] == 4)
-            {
-                return i;
-            }
-        }
-        return 0;
     }
     public MyCube GetCubeAtPosition(Vector3 position)
     {

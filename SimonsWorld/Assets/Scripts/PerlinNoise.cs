@@ -30,6 +30,13 @@ public class PerlinNoise : MonoBehaviour
     }
     void GenerateIsland()
     {
+        int seed = (int)System.DateTime.Now.Ticks;
+
+        UnityEngine.Random.InitState(seed);
+        float offsetX = UnityEngine.Random.Range(-2, 2);
+        float offsetY = UnityEngine.Random.Range(-2, 2);
+        Vector2 offset = new Vector2(offsetX, offsetY);
+        WorldSize = Random.Range(25,40);
 
         heights = new float[WorldSize, WorldSize];
 
@@ -45,7 +52,7 @@ public class PerlinNoise : MonoBehaviour
                 float percentX = (float)x / WorldSize;
                 float percentY = (float)y / WorldSize;
 
-                heights[x, y] = Mathf.PerlinNoise(percentX * WorldSize * frequency, percentY * WorldSize * frequency) * 0.05f;
+                heights[x, y] = Mathf.PerlinNoise(percentX * WorldSize * offsetX * frequency, percentY * WorldSize * offsetY * frequency) * 0.05f;
 
                 float distante = Vector2.Distance(new Vector2(0.5f, 0.5f), new Vector2(percentX, percentY)) * 2;
 

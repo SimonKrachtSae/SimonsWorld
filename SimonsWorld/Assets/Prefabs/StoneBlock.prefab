@@ -49,10 +49,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   surroundingCells: []
   m_NumberOfTexturesPerRow: {x: 16, y: 16}
-  m_NumberOfTexture: ef000000ef000000ef000000ef000000ef000000ef000000
+  m_NumberOfTexture: e0000000e0000000e0000000e0000000e0000000e0000000
   X_Index: 0
   Y_Index: 0
   Z_Index: 0
+  hasNode: 0
+  nodeOnTop: {fileID: 0}
   Position: {x: 0, y: 0, z: 0}
 --- !u!33 &129749279852646275
 MeshFilter:

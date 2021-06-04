@@ -59,6 +59,12 @@ public class MyNodeManager : MonoBehaviour
         {
             m_nodes[i].ConfigSurroundingNodes();
         }
+        AiManager aiManager = AiManager.Instance;
+        List<PathFinding> creepersInGame = aiManager.GetCreepersInGame();
+        for(int i = 0; i < creepersInGame.Count; i++)
+        {
+            creepersInGame[i].RecalculatePath();
+        }
     }
     public float GetDistanceBetween(Node a, Node b)
     {

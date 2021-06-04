@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    private Rigidbody rigidBody;
+    private bool isGrounded;
     void Start()
     {
-        
+        rigidBody = transform.GetComponent<Rigidbody>();
     }
     void Update()
     {
@@ -14,15 +16,33 @@ public class Movement : MonoBehaviour
         transform.position += (transform.forward * Input.GetAxis("Vertical")
             + transform.right * Input.GetAxis("Horizontal")) * Time.deltaTime * MoveSpeed;
 
-        if(Input.GetKey(KeyCode.E))
+        //if(Input.GetKey(KeyCode.E))
+        //{
+        //    transform.position += transform.up * Time.deltaTime * MoveSpeed;
+        //}
+        //if(Input.GetKey(KeyCode.Q))
+        //{
+        //    transform.position -= transform.up * Time.deltaTime * MoveSpeed;
+        //}
+       
+            if (Input.GetKey(KeyCode.Space) && isGrounded)
         {
-            transform.position += transform.up * Time.deltaTime * MoveSpeed;
+            rigidBody.AddForce(Vector3.up * 250);
         }
-        if(Input.GetKey(KeyCode.Q))
+        
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("Block"))
         {
-            transform.position -= transform.up * Time.deltaTime * MoveSpeed;
+            isGrounded = true;
         }
-
-
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.collider.CompareTag("Block"))
+        {
+            isGrounded = false;
+        }
     }
 }

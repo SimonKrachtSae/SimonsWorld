@@ -6,7 +6,13 @@ public class BlockBuilder : MonoBehaviour
 {
     private List<MyCube> inventoryCubes = new List<MyCube>();
     [SerializeField] private GameObject kamera;
-    [SerializeField] private MyWorld world;
+    private MyWorld world;
+    [SerializeField] private AudioSource buildSound;
+
+    private void Start()
+    {
+        world = MyWorld.Instance;
+    }
     private void Update()
     {
         if(Input.GetMouseButtonDown(0))
@@ -25,6 +31,7 @@ public class BlockBuilder : MonoBehaviour
         {
             if (hit.collider.CompareTag("Block"))
             {
+                buildSound.Play();
                 Vector3 position = hit.collider.transform.position;
                 Vector3 direction = hit.normal.normalized;
                 int x = Mathf.RoundToInt(position.x + direction.x);
@@ -41,6 +48,7 @@ public class BlockBuilder : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(kamera.transform.position, kamera.transform.forward * 5, out hit))
         {
+            buildSound.Play();
             if(hit.collider.CompareTag("Block"))
             {
                 world.DestroyBlock(hit.collider.gameObject.GetComponent<MyCube>());

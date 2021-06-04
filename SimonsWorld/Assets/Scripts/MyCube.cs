@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Inspire by: Generische Welten - Chapter 2 - 0920 Abends - Games Programming
 public class MyCube : MonoBehaviour
 {
     public List<MyCube> surroundingCells;
@@ -15,9 +16,6 @@ public class MyCube : MonoBehaviour
     public int X_Index;
     public int Y_Index;
     public int Z_Index;
-
-    public bool hasNode = false;
-    public Node nodeOnTop;
 
     public  Vector3 Position;
             

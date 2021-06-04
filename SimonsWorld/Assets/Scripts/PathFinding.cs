@@ -16,8 +16,11 @@ public class PathFinding : MonoBehaviour
 
     private int pathCounter = 0;
     private float moveSpeed;
+    private bool recalulate;
+
     private void Start()
     {
+        AiManager.Instance.Subscribe(this);
         myNodeManager = MyNodeManager.Instance;
     }
 
@@ -26,8 +29,9 @@ public class PathFinding : MonoBehaviour
         if (targetObject == null)
             return;
         Node closestToTarget = GetClosestNodeToTarget();
-        if(closestToTarget != targetNode || targetNode == null)
+        if(closestToTarget != targetNode || targetNode == null || recalulate)
         {
+            recalulate = false;
             RefreshLists();
             pathCounter = 0;
             targetNode = closestToTarget;
@@ -123,6 +127,9 @@ public class PathFinding : MonoBehaviour
     }
     private void SetSurroundingNodesCostsAndPreviousNode()
     {
+        if (current.surroundingNodes == null || current.surroundingNodes.Count == 0)
+            return;
+
         for( int i = 0; i < current.surroundingNodes.Count; i++)
         {
             if (!closed.Contains(current.surroundingNodes[i]))
@@ -151,7 +158,7 @@ public class PathFinding : MonoBehaviour
            node.SetG_CostRealtiveTo(current);
         }
     }
-    private Node ClosestNode()
+    public Node ClosestNode()
     {
         float closestDistance = Mathf.Infinity;
         Node closestNode = null;
@@ -256,5 +263,14 @@ public class PathFinding : MonoBehaviour
         Vector3 newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
         Debug.DrawRay(transform.position, newDirection, Color.red);
         transform.rotation = Quaternion.LookRotation(newDirection);
+    }
+    public void RecalculatePath()
+    {
+        recalulate = true;
+    }
+
+    private void OnDestroy()
+    {
+        AiManager.Instance.UnSubscribe(this);
     }
 }
