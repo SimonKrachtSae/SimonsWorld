@@ -95,10 +95,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surroundingCells: []
-  m_NumberOfTexturesPerRow: {x: 16, y: 16}
-  m_NumberOfTexture: 2e0000002e0000002e0000002e0000002e0000002e000000
-  X_Index: 0
-  Y_Index: 0
-  Z_Index: 0
-  Position: {x: 0, y: 0, z: 0}
+  numberOfTexturesPerRow: {x: 16, y: 16}
+  numberOfTexture: 2f0000002f0000002f0000002f0000002f0000002f000000
   surroundingWaterCubes: []

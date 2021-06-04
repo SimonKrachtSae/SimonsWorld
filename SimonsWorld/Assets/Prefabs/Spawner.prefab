@@ -46,14 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surroundingCells: []
-  m_NumberOfTexturesPerRow: {x: 16, y: 16}
-  m_NumberOfTexture: a2000000a2000000a2000000a2000000a2000000a2000000
-  X_Index: 0
-  Y_Index: 0
-  Z_Index: 0
-  hasNode: 0
-  nodeOnTop: {fileID: 0}
-  Position: {x: 0, y: 0, z: 0}
+  numberOfTexturesPerRow: {x: 16, y: 16}
+  numberOfTexture: 920000009200000092000000920000009200000092000000
 --- !u!23 &3246676974331036041
 MeshRenderer:
   m_ObjectHideFlags: 0

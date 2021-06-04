@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
     public static Player Instance;
-    [SerializeField] private int health = 100;
+    [SerializeField] private int health = 150;
     [SerializeField] private GameObject playerCam;
     [SerializeField] private AudioSource hurtSound;
     [SerializeField] private AudioSource hitSound;
@@ -50,6 +51,7 @@ public class Player : MonoBehaviour
     }
     private void OnDestroy()
     {
-        
+        SceneManager.LoadScene("GameOverScene");
+        Cursor.lockState = CursorLockMode.None;
     }
 }

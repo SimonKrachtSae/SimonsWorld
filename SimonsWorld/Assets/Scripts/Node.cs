@@ -18,7 +18,7 @@ public class Node : MonoBehaviour
     }
     public void ConfigSurroundingNodes()
     {
-        MyNodeManager myNodeManager = MyNodeManager.Instance;
+        NodeManager myNodeManager = NodeManager.Instance;
         List<Node> nodesInWorld = myNodeManager.GetNodesInWorld();
         for (int i = 0; i < nodesInWorld.Count; i++)
         {

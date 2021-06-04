@@ -89,6 +89,9 @@ public class CreeperAi : MonoBehaviour
     }
     private bool PlayerIsInRange()
     {
+        if (PlayerPref == null)
+            return false;
+
         if((PlayerPref.transform.position - transform.position).magnitude < 10)
         {
             return true;
@@ -101,7 +104,7 @@ public class CreeperAi : MonoBehaviour
     }
     private void Explosion()
     {
-        float explosionRadius = 1.5f;
+        float explosionRadius = 2.0f;
         if(PlayerIsInRange())
         {
             fireSound.Play();
@@ -118,21 +121,19 @@ public class CreeperAi : MonoBehaviour
             if(explosionTimer <= 0)
             {
                 explosionSound.Play();
-                //Node closestNode = pathFinding.ClosestNode();
-                //List<GameObject> CubesToDestroy = new List<GameObject>();
-                MyWorld world = MyWorld.Instance;
-                int scale = world.scale;
+                World world = World.Instance;
+                int scale = world.GetScale();
                 for(int x = 0; x < scale; x++)
                 {
                     for (int y = 0; y < scale; y++)
                     {
                         for (int z = 0; z < scale; z++)
                         {
-                            if(world.WorldCubes[x,y,z] != null)
+                            if(world.GetWorldCubeAtIndex(x,y,z) != null)
                             {
-                                if((world.WorldCubes[x, y, z].transform.position - transform.position).magnitude < explosionRadius)
+                                if((world.GetWorldCubeAtIndex(x, y, z).transform.position - transform.position).magnitude < explosionRadius)
                                 {
-                                    world.DestroyBlock(world.WorldCubes[x, y, z]);
+                                    world.DestroyBlock(world.GetWorldCubeAtIndex(x, y, z));
                                 }
                             }
                         }

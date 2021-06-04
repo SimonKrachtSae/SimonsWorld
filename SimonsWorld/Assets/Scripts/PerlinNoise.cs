@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Inspired by Luca Martinelli (OCE Practice)
 public class PerlinNoise : MonoBehaviour
 {
     public static PerlinNoise Instance;
 
     [SerializeField] private TerrainData terrainData;
-    public int WorldSize;
-    public float frequency = 1f;
-    public float[,] heights;
+    private int worldSize;
+    private float frequency = 1f;
     void Awake()
     {
         if (Instance != null)
@@ -36,23 +36,23 @@ public class PerlinNoise : MonoBehaviour
         float offsetX = UnityEngine.Random.Range(-2, 2);
         float offsetY = UnityEngine.Random.Range(-2, 2);
         Vector2 offset = new Vector2(offsetX, offsetY);
-        WorldSize = Random.Range(25,40);
 
-        heights = new float[WorldSize, WorldSize];
+        worldSize = Random.Range(25,40);
 
-        float xHalf = (float)WorldSize / 2;
-        float yHalf = (float)WorldSize / 2;
+        float[,] heights = new float[worldSize, worldSize];
+
+        float xHalf = (float)worldSize / 2;
+        float yHalf = (float)worldSize / 2;
         Vector2 middle = new Vector2(xHalf, yHalf);
-        float maxDistance = (middle - new Vector2(0, 0)).magnitude;
 
-        for (int x = 0; x < WorldSize; ++x)
+        for (int x = 0; x < worldSize; ++x)
         {
-            for (int y = 0; y < WorldSize; ++y)
+            for (int y = 0; y < worldSize; ++y)
             {
-                float percentX = (float)x / WorldSize;
-                float percentY = (float)y / WorldSize;
+                float percentX = (float)x / worldSize;
+                float percentY = (float)y / worldSize;
 
-                heights[x, y] = Mathf.PerlinNoise(percentX * WorldSize * offsetX * frequency, percentY * WorldSize * offsetY * frequency) * 0.05f;
+                heights[x, y] = Mathf.PerlinNoise(percentX * worldSize * offsetX * frequency, percentY * worldSize * offsetY * frequency) * 0.05f;
 
                 float distante = Vector2.Distance(new Vector2(0.5f, 0.5f), new Vector2(percentX, percentY)) * 2;
 
@@ -61,37 +61,8 @@ public class PerlinNoise : MonoBehaviour
         }
         terrainData.SetHeights(0, 0, heights);
     }
-    //private void Fbm(int numOctaves, float scale = 25.0f, float lacunarity = 2.20f, float persistance = 0.5f)
-    //{
-    //    float maxNoiseHeight = float.MinValue;
-    //    float minNoiseHeight = float.MaxValue;
-    //
-    //    int size = terrainData.heightmapResolution;
-    //
-    //    heights = new float[size, size];
-    //
-    //    for (int x = 0; x < size; ++x)
-    //    {
-    //        for (int y = 0; y < size; ++y)
-    //        {
-    //            float value = 0;
-    //
-    //            float amplitude = 0.5f;
-    //            float frequency = 1.0f;
-    //
-    //            for (int i = 0; i < numOctaves; i++)
-    //            {
-    //                float sampleX = x / scale * frequency;
-    //                float sampleY = y / scale * frequency;
-    //
-    //                heights[x,y] = (Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1) * amplitude;
-    //
-    //                frequency *= lacunarity;
-    //                amplitude *= persistance;
-    //
-    //            }
-    //        }
-    //    }
-    //    terrainData.SetHeights(0, 0, heights);
-    //}
+    public int GetWorldSize()
+    {
+        return worldSize;
+    }
 }

@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class BlockBuilder : MonoBehaviour
 {
-    private List<MyCube> inventoryCubes = new List<MyCube>();
+    private List<Cube> inventoryCubes = new List<Cube>();
     [SerializeField] private GameObject kamera;
-    private MyWorld world;
+    private World world;
     [SerializeField] private AudioSource buildSound;
 
     private void Start()
     {
-        world = MyWorld.Instance;
+        world = World.Instance;
     }
     private void Update()
     {
@@ -51,7 +51,7 @@ public class BlockBuilder : MonoBehaviour
             buildSound.Play();
             if(hit.collider.CompareTag("Block"))
             {
-                world.DestroyBlock(hit.collider.gameObject.GetComponent<MyCube>());
+                world.DestroyBlock(hit.collider.gameObject.GetComponent<Cube>());
             }
         }
     }

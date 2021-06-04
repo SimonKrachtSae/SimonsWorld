@@ -37,7 +37,7 @@ public class WanderState : State
     }
     private GameObject RandomDestination()
     {
-        MyNodeManager nodeManager = MyNodeManager.Instance;
+        NodeManager nodeManager = NodeManager.Instance;
         List<Node> worldNodes = nodeManager.GetNodesInWorld();
         int randomIndex = Random.Range(0, worldNodes.Count - 1);
         return worldNodes[randomIndex].gameObject;

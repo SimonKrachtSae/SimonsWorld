@@ -12,7 +12,7 @@ public class PathFinding : MonoBehaviour
     private List<Node> closed;
     private List<Node> Path;
 
-    private MyNodeManager myNodeManager;
+    private NodeManager myNodeManager;
 
     private int pathCounter = 0;
     private float moveSpeed;
@@ -20,8 +20,8 @@ public class PathFinding : MonoBehaviour
 
     private void Start()
     {
-        AiManager.Instance.Subscribe(this);
-        myNodeManager = MyNodeManager.Instance;
+        PathfindingManager.Instance.Subscribe(this);
+        myNodeManager = NodeManager.Instance;
     }
 
     private void Update()
@@ -271,6 +271,6 @@ public class PathFinding : MonoBehaviour
 
     private void OnDestroy()
     {
-        AiManager.Instance.UnSubscribe(this);
+        PathfindingManager.Instance.UnSubscribe(this);
     }
 }
